@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:context=".MainActivity">
+
+    <!--ImageView in which image will be set-->
+    <ImageView
+        android:id="@+id/image_view"
+
+        android:scaleType="centerCrop"
+        android:layout_width="400dp"
+        android:layout_height="400dp" />
+
+    <!-- OCR result will be displayed here-->
+    <TextView
+        android:id="@+id/ocr_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--Button to open camera-->
+    <Button
+        android:id="@+id/capture_btn"
+        android:text="Capture Image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
