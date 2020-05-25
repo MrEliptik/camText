@@ -29,4 +29,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!--Button to share text result-->
+    <Button
+        android:id="@+id/share_btn"
+        android:text="Share"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

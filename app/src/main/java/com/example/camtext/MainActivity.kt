@@ -55,6 +55,14 @@ class MainActivity : AppCompatActivity() {
                 openCamera()
             }
         }
+
+        //button click
+        share_btn.setOnClickListener {
+            val sharingIntent = Intent(Intent.ACTION_SEND)
+            sharingIntent.type = "text/plain"
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, ocr_result.text)
+            startActivity(Intent.createChooser(sharingIntent, "Share via"))
+        }
     }
 
     private fun setupOCR() {
