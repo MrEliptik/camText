@@ -1,39 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
     tools:context=".MainActivity">
 
-    <!--ImageView in which image will be set-->
-    <ImageView
-        android:id="@+id/image_view"
+    <ImageButton
+        android:id="@+id/camera_capture_button"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginBottom="50dp"
+        android:adjustViewBounds="true"
+        android:background="#00FFFFFF"
+        android:elevation="2dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/capture_btn"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
-        android:scaleType="centerCrop"
-        android:layout_width="400dp"
-        android:layout_height="400dp" />
-
-    <!-- OCR result will be displayed here-->
-    <TextView
-        android:id="@+id/ocr_result"
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+    </androidx.camera.view.PreviewView>
 
-    <!--Button to open camera-->
-    <Button
-        android:id="@+id/capture_btn"
-        android:text="Capture Image"
+    <ImageButton
+        android:id="@+id/option_button"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:backgroundTint="#00FFFFFF"
+        android:scaleType="centerInside"
+        android:src="@drawable/options_50"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageButton
+        android:id="@+id/exit_button"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:backgroundTint="#00FFFFFF"
+        android:scaleType="centerInside"
+        android:src="@drawable/exit_48"
+        android:tint="#E32727"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <View
+        android:id="@+id/shutterEffect"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:visibility="invisible" />
 
-    <!--Button to share text result-->
-    <Button
-        android:id="@+id/share_btn"
-        android:text="Share"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
