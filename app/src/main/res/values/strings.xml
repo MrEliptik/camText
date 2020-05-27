@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">CamText</string>
+
+    <string name="history_activity">History</string>
+    <string name="result_activity">OCR result</string>
+    <string name="history">History</string>
+    <string name="options">Settings</string>
+    <string name="history_no_result">No history yet</string>
+    <string name="clear">Clear</string>
 </resources>

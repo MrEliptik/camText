@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CamText</string>
+
+    <string name="history_activity">Historique</string>
+    <string name="result_activity">Résultat OCR</string>
+    <string name="history">Historique</string>
+    <string name="options">Options</string>
+    <string name="history_no_result">Historique vide</string>
+    <string name="clear">Vider</string>
+</resources>
