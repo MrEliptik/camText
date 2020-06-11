@@ -60,18 +60,14 @@ class AboutActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(sharingIntent, "Share via"))
     }
     private fun emailContact() {
-        val email = "victormeunier.dev@gmail.com"
-        val subject = "I'm contacting your from CamText.."
-        val body = ""
-        val chooserTitle = "Send email"
-        val uri = Uri.parse("mailto:$email")
-            .buildUpon()
-            .appendQueryParameter("subject", subject)
-            .appendQueryParameter("body", body)
-            .build()
-
-        val emailIntent = Intent(Intent.ACTION_SENDTO, uri)
-        startActivity(Intent.createChooser(emailIntent, chooserTitle))
+        val emailIntent = Intent(
+            Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto", "victormeunier.dev@gmail.com", null
+            )
+        )
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "I'm contacting your from CamText..")
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "")
+        startActivity(Intent.createChooser(emailIntent, "Send email"))
     }
 
 
