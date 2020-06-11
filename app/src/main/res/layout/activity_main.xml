@@ -5,22 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <ImageButton
-        android:id="@+id/camera_capture_button"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_marginBottom="50dp"
-        android:adjustViewBounds="true"
-        android:background="#00FFFFFF"
-        android:elevation="2dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/capture_btn"
-        android:tint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+    tools:context=".MainActivity"
+    android:background="#1C2035"
+    android:id="@+id/main">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
@@ -30,11 +17,62 @@
         tools:layout_editor_absoluteY="0dp">
     </androidx.camera.view.PreviewView>
 
+    <View
+        android:id="@+id/blur"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#A6191919"
+        android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/loading_anim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:indeterminateTint="#03A9F4"
+        android:progressTint="#03A9F4"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/viewFinder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/steady"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/steady"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/camera_capture_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loading_anim"
+        app:layout_constraintVertical_bias="0.04000002" />
+
+    <ImageButton
+        android:id="@+id/camera_capture_button"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginBottom="35dp"
+        android:adjustViewBounds="true"
+        android:background="#00FFFFFF"
+        android:contentDescription="@string/capture_button"
+        android:elevation="2dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/capture_btn_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
     <ImageButton
         android:id="@+id/option_button"
         android:layout_width="53dp"
         android:layout_height="53dp"
         android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/option_button"
         android:scaleType="centerInside"
         android:src="@drawable/options_50"
         android:tint="#FFFFFF"
@@ -48,13 +86,76 @@
         android:layout_width="53dp"
         android:layout_height="53dp"
         android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/exit_button"
         android:scaleType="centerInside"
         android:src="@drawable/exit_48"
-        android:tint="#E32727"
+        android:tint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageButton
+        android:id="@+id/flash_button"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/flash_button"
+        android:scaleType="centerInside"
+        android:src="@drawable/flash_deactived_48"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/option_button"
+        app:layout_constraintStart_toEndOf="@+id/exit_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#BF2E3247"
+        android:gravity="top"
+        app:layout_constraintBottom_toBottomOf="@+id/viewFinder" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#03A9F4" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/gallery_button"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/exit_button"
+        android:scaleType="centerInside"
+        android:src="@drawable/gallery_48"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.16"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.99" />
+
+    <ImageButton
+        android:id="@+id/history_button"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/exit_button"
+        android:scaleType="centerInside"
+        android:src="@drawable/history_48"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.84"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.99" />
 
     <View
         android:id="@+id/shutterEffect"
@@ -62,5 +163,7 @@
         android:layout_height="match_parent"
         android:background="#000000"
         android:visibility="invisible" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,10 +1,71 @@
 <resources>
     <string name="app_name">CamText</string>
 
-    <string name="history_activity">History</string>
+    <!-- Result Activity -->
     <string name="result_activity">OCR result</string>
     <string name="history">History</string>
     <string name="options">Settings</string>
+    <string name="about">About</string>
+    <string name="image_view">Captured image</string>
+    <string name="translate_button">Translation button</string>
+    <string name="clipboard_button">Clipboard button</string>
+    <string name="share_button">Share button</string>
+
+    <!-- History Activity -->
+    <string name="history_activity">History</string>
     <string name="history_no_result">No history yet</string>
+    <string name="erase">Erase history</string>
     <string name="clear">Clear</string>
+
+    <!-- Main Activity -->
+    <string name="capture_button">Camera capture button</string>
+    <string name="exit_button">Exit</string>
+    <string name="option_button">Options</string>
+    <string name="flash_button">Flash</string>
+    <string name="result_title">Text extracted</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+
+    <!-- Messages Preferences -->
+
+    <!-- Sync Preferences -->
+    <string name="language_title">Language</string>
+    <string name="history_header">History</string>
+    <string name="general_header">General</string>
+    <string name="history_title">Save OCR history</string>
+    <!-- Strings used for fragments for navigation -->
+
+    <string name="dev_name">Victor Meunier</string>
+    <string name="dev_email">victormeunier.dev@gmail.com</string>
+    <string name="dev_github">github.com/MrEliptik</string>
+    <string name="dev_website">www.victormeunier.com</string>
+    <string name="rate">Rate    ⭐⭐⭐⭐⭐</string>
+    <string name="dev">Developper</string>
+    <string name="feedback">Give feedback</string>
+    <string name="about_me">About me</string>
+    <string name="website">Website</string>
+    <string name="support_title">Support me</string>
+    <string name="share_app">Share this app</string>
+    <string name="contact">Contact me</string>
+    <string name="buy_me_coffee">Buy me a coffee ☕</string>
+    <string name="donate_paypal">Donate on PayPal</string>
+    <string name="rate_title">Rate this app</string>
+    <string name="capture">Capture</string>
+    <string name="translate">Translate</string>
+    <string name="copy">Copy</string>
+    <string name="share">Share</string>
+    <string name="copied">Copied</string>
+    <string name="copied_toast">Copied to clipboard.</string>
+    <string name="press_again_exit">Press back again to exit</string>
+    <string name="permission_not_granted">Permissions not granted by the user.</string>
+    <string name="erase_history">Erase history</string>
+    <string name="msg_erase_history">Are you sure you want to erase history?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="steady">Stay steady!</string>
+    <string name="app_title">Application</string>
+    <string name="app_version">1.0</string>
+    <string name="version">Version</string>
+    <string name="sure_exit">Are you sure you want to exit?</string>
 </resources>

@@ -2,10 +2,63 @@
 <resources>
     <string name="app_name">CamText</string>
 
-    <string name="history_activity">Historique</string>
+    <!-- Result Activity -->
     <string name="result_activity">Résultat OCR</string>
     <string name="history">Historique</string>
     <string name="options">Options</string>
+    <string name="about">À propos</string>
+    <string name="image_view">Image capturée</string>
+    <string name="translate_button">Bouton de traduction</string>
+    <string name="clipboard_button">Bouton de copie presse-papier</string>
+    <string name="share_button">Bouton de partage</string>
+
+    <!-- History Activity -->
+    <string name="history_activity">Historique</string>
     <string name="history_no_result">Historique vide</string>
+    <string name="erase">Vider l\'historique</string>
     <string name="clear">Vider</string>
+
+    <!-- Main Activity -->
+    <string name="capture_button">Bouton capture de camera</string>
+    <string name="exit_button">Quitter</string>
+    <string name="option_button">Options</string>
+    <string name="flash_button">Flash</string>
+    <string name="result_title">Text extrait</string>
+    <string name="title_activity_settings">Préférences</string>
+    <string name="language_title">Langue</string>
+    <string name="general_header">Général</string>
+    <string name="history_header">Historique</string>
+    <string name="history_title">Sauvegarder l\'historique</string>
+    <string name="dev_name">Victor Meunier</string>
+    <string name="dev_email">victormeunier.dev@gmail.com</string>
+    <string name="dev_github">github.com/MrEliptik</string>
+    <string name="dev_website">www.victormeunier.com</string>
+    <string name="rate">Noter    ⭐⭐⭐⭐⭐</string>
+    <string name="dev">Développeur</string>
+    <string name="feedback">Faire un retour</string>
+    <string name="about_me">À propos de moi</string>
+    <string name="website">Site web</string>
+    <string name="share_app">Partager</string>
+    <string name="support_title">M\'aider</string>
+    <string name="contact">Me contacter</string>
+    <string name="buy_me_coffee">Payez-moi un café ☕</string>
+    <string name="donate_paypal">Faire un don PayPal</string>
+    <string name="rate_title">Noter l\'application</string>
+    <string name="capture">Camera</string>
+    <string name="translate">Traduire</string>
+    <string name="copy">Copier</string>
+    <string name="share">Partager</string>
+    <string name="copied">Copié</string>
+    <string name="copied_toast">Copié dans le presse-papier.</string>
+    <string name="press_again_exit">Appuyer sur retour de nouveau pour quitter</string>
+    <string name="permission_not_granted">Permissions non accordées</string>
+    <string name="erase_history">Effacer l\'historique</string>
+    <string name="msg_erase_history">Êtes-vous sûr de vouloir effacer l\'historique ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="steady">Ne bougez pas!</string>
+    <string name="app_title">Application</string>
+    <string name="app_version">1.0</string>
+    <string name="version">Version</string>
+    <string name="sure_exit">Êtes-vous sûr de vouloir quitter ?</string>
 </resources>

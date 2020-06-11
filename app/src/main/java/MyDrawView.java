@@ -122,6 +122,7 @@ public class MyDrawView extends View {
                 invalidate();
                 break;
         }
+        // Consume event
         return true;
     }
 
@@ -136,16 +137,16 @@ public class MyDrawView extends View {
 
         for (Point p : pointsList){
             if ( p.x < xmin )
-                xmin = p.x - mPaint.getStrokeWidth();;
+                xmin = p.x - (mPaint.getStrokeWidth()/2);
 
             if ( p.y < ymin )
-                ymin = p.y - mPaint.getStrokeWidth();
+                ymin = p.y - (mPaint.getStrokeWidth()/2);
 
             if ( p.x > xmax )
-                xmax = p.x + mPaint.getStrokeWidth();
+                xmax = p.x + (mPaint.getStrokeWidth()/2);
 
             if ( p.y > ymax )
-                ymax = p.y + mPaint.getStrokeWidth();
+                ymax = p.y + (mPaint.getStrokeWidth()/2);
         }
         if(xmin != Double.POSITIVE_INFINITY && xmax != Double.NEGATIVE_INFINITY &&
                 ymin != Double.POSITIVE_INFINITY && ymax != Double.NEGATIVE_INFINITY &&
@@ -155,7 +156,6 @@ public class MyDrawView extends View {
             rectanglePoints.add(xmax);
             rectanglePoints.add(ymax);
         }
-
 
         return rectanglePoints;
     }

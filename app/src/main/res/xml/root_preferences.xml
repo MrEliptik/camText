@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@style/SettingsFragmentStyle" >
+
+    <!--
+    <PreferenceCategory app:title="@string/general_header">
+
+        <ListPreference
+            app:defaultValue="English"
+            app:entries="@array/languages_entries"
+            app:entryValues="@array/languages_values"
+            app:key="language"
+            app:title="@string/language_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+    -->
+
+    <PreferenceCategory app:title="@string/history_header">
+
+        <SwitchPreferenceCompat
+            app:key="history"
+            app:title="@string/history_title"
+            app:defaultValue="true"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

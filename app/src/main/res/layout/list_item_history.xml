@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="115dp"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        android:background="@drawable/card_solid"
+        android:elevation="2dp"
+
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            app:cardCornerRadius="3dp"
+            android:layout_marginRight="10dp"
+            android:elevation="10dp">
+
+            <ImageView
+                android:id="@+id/history_list_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#03A9F4"
+            android:layout_marginRight="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/history_list_title"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="#F1F0F0" />
+
+            <TextView
+                android:id="@+id/history_list_date"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:textAlignment="viewEnd"
+                android:textColor="#BDBDBD" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

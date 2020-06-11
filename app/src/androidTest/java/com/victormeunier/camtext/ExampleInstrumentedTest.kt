@@ -1,4 +1,4 @@
-package com.example.camtext
+package com.victormeunier.camtext
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

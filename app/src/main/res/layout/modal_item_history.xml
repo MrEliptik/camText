@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:orientation="vertical"
+    android:background="@drawable/card_solid"
+    android:elevation="2dp"
+
+    android:padding="10dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.0"
+    android:id="@+id/modal_item" >
+
+    <Button
+        android:id="@+id/exit_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="end"
+        android:background="#00FFFFFF"
+        android:drawableEnd="@drawable/exit_48"
+        android:drawableTint="#ffffff" />
+
+    <ImageView
+        android:id="@+id/history_list_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/image_placeholder"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#03A9F4"
+        android:layout_margin="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/history_list_date"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:textAlignment="viewEnd"
+            android:textColor="#BDBDBD"
+            android:text="05/06/2020" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:scrollbarThumbVertical="@android:color/white">
+
+            <TextView
+                android:id="@+id/history_list_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#F1F0F0"
+                android:text="BLAAAAAAAAAABLAAAA MCUUUUUUUUUEHCUEHH EUCH EUH
+               EUHEUFHEUFHUEHFHEUFH fzfzezgzegzegg ggzzgzgzgzgzg" />
+
+        </ScrollView>
+
+    </LinearLayout>
+</LinearLayout>

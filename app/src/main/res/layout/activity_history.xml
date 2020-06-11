@@ -4,19 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HistoryActivity">
-
-    <ListView
-        android:id="@+id/history_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/history_no_result" />
+    tools:context=".HistoryActivity"
+    android:id="@+id/main_history"
+    android:background="#1C2035" >
 
     <TextView
         android:id="@+id/empty_element"
         android:layout_width="200dp"
         android:layout_height="30dp"
         android:text="@string/history_no_result"
+        android:textColor="#ffffff"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="@+id/clear_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,16 +22,26 @@
         app:layout_constraintVertical_bias="0.41000003"
         tools:ignore="MissingConstraints" />
 
-    <Button
+    <ListView
+        android:id="@+id/history_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/history_no_result" />
+
+    <ImageButton
         android:id="@+id/clear_button"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="10dp"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginBottom="20dp"
+        android:background="#00FFFFFF"
+        android:scaleType="centerInside"
+        android:src="@drawable/bin_48"
         android:text="@string/clear"
-        android:background="#EF6464"
-        android:textColor="#E3E3E3"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

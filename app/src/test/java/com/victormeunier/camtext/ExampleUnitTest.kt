@@ -1,4 +1,4 @@
-package com.example.camtext
+package com.victormeunier.camtext
 
 import org.junit.Test
 
