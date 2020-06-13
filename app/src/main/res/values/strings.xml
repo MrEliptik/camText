@@ -68,4 +68,7 @@
     <string name="app_version">1.0</string>
     <string name="version">Version</string>
     <string name="sure_exit">Are you sure you want to exit?</string>
+    <string name="volume_down_title">Capture photo on volume down press</string>
+    <string name="image_history_title">Delete images on device when erasing history</string>
+    <string name="selecting">item(s) selected</string>
 </resources>

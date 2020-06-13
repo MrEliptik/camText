@@ -14,16 +14,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextRecognizer
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_result.*
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -70,7 +69,8 @@ class ResultActivity : AppCompatActivity() {
             clipboard_btn.text = resources.getString(R.string.copied)
             clipboard_btn.invalidate()
 
-            Toast.makeText(this, resources.getString(R.string.copied_toast), Toast.LENGTH_SHORT).show()
+            Snackbar.make(result_main, resources.getString(R.string.copied_toast), Snackbar.LENGTH_SHORT).show()
+            //Toast.makeText(this, resources.getString(R.string.copied_toast), Toast.LENGTH_SHORT).show()
         }
 
         // Translate button
@@ -87,6 +87,19 @@ class ResultActivity : AppCompatActivity() {
         val extras = intent.extras
         if (extras != null) {
             var imageUri = Uri.parse(extras.getString("imageUri"))
+            //set image captured to image view
+            /*
+            val bitmap: Bitmap = BitmapFactory.decodeFile(imageUri.path)
+            if (bitmap != null) image_view.setImageBitmap(bitmap) else {
+                image_view.setImageResource(R.drawable.image_placeholder)
+            }
+            */
+            try {
+                image_view.setImageURI(imageUri)
+            } catch (e: Throwable) {
+                image_view.setImageResource(R.drawable.image_placeholder)
+            }
+            /*
             val file = File(imageUri.path)
             if (file.exists()) {
                 //set image captured to image view
@@ -96,6 +109,7 @@ class ResultActivity : AppCompatActivity() {
             {
                 image_view.setImageResource(R.drawable.image_placeholder)
             }
+            */
         }
 
         // TODO: handle text selection
@@ -217,7 +231,8 @@ class ResultActivity : AppCompatActivity() {
         textRecognizer = TextRecognizer.Builder(this).build()
 
         if (!textRecognizer.isOperational) {
-            Toast.makeText(this, "Dependencies are not loaded yet...please try after few moment!!", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this, "Dependencies are not loaded yet...please try after few moment!!", Toast.LENGTH_SHORT).show()
+            Snackbar.make(result_main, "Dependencies are not loaded yet...please try after few moment!!", Snackbar.LENGTH_SHORT).show()
             Log.d("OCR","Dependencies are downloading....try after few moment")
             return
         }

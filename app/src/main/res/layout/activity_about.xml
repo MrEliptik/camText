@@ -15,7 +15,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="25dp"
+            android:layout_marginHorizontal="25dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -24,6 +24,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginBottom="10dp"
                 android:text="@string/app_name"
                 android:textColor="#ffffff"
@@ -39,6 +40,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/about_me"
                 android:textColor="#A3A2A2"
                 android:textSize="20sp"
@@ -48,6 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_weight="1"
                 android:layout_marginBottom="10dp" >
 
                 <TextView
@@ -81,6 +84,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginVertical="10dp" >
 
@@ -121,6 +125,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginVertical="10dp"
                 android:orientation="horizontal">
 
@@ -162,6 +167,7 @@
                 android:id="@+id/contact"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginVertical="10dp" >
 
@@ -194,6 +200,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/support_title"
                 android:textColor="#A3A2A2"
                 android:textSize="20sp"
@@ -203,6 +210,7 @@
                 android:id="@+id/feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginBottom="10dp" >
 
@@ -237,6 +245,7 @@
                 android:id="@+id/rate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginVertical="10dp" >
 
@@ -278,6 +287,7 @@
                 android:id="@+id/share"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginVertical="10dp" >
 
@@ -313,6 +323,7 @@
                 android:id="@+id/coffee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginVertical="10dp" >
 
@@ -347,6 +358,7 @@
                 android:id="@+id/paypal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginVertical="10dp" >
 
@@ -374,6 +386,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/app_title"
                 android:textColor="#A3A2A2"
                 android:textSize="20sp"
@@ -383,6 +396,7 @@
                 android:id="@+id/version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:layout_marginBottom="10dp" >
 
@@ -399,6 +413,7 @@
                     android:layout_weight="1" />
 
                 <TextView
+                    android:id="@+id/version_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/app_version"
@@ -407,4 +422,5 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

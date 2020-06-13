@@ -13,9 +13,7 @@
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
-    </androidx.camera.view.PreviewView>
+        android:scaleType="fitCenter" />
 
     <View
         android:id="@+id/blur"
@@ -112,11 +110,12 @@
 
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="#BF2E3247"
         android:gravity="top"
-        app:layout_constraintBottom_toBottomOf="@+id/viewFinder" >
+        app:layout_constraintBottom_toBottomOf="@+id/viewFinder">
 
         <View
             android:layout_width="match_parent"

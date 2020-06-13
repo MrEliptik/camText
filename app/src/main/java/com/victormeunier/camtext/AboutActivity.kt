@@ -2,6 +2,7 @@ package com.victormeunier.camtext
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,8 @@ class AboutActivity : AppCompatActivity() {
         coffee.setOnClickListener { followLink("https://buymeacoff.ee/mreliptik") }
         paypal.setOnClickListener { followLink("https://paypal.me/VictorMeunier") }
 
+        val pInfo: PackageInfo = applicationContext.packageManager.getPackageInfo(packageName, 0)
+        version_number.text = pInfo.versionName
     }
 
     override fun onSupportNavigateUp(): Boolean {

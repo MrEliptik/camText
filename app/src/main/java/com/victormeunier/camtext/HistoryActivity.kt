@@ -1,19 +1,22 @@
 package com.victormeunier.camtext
 
-import HistoryDialogClass
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import kotlinx.android.synthetic.main.activity_history.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -21,8 +24,12 @@ import org.json.JSONObject
 
 class HistoryActivity : AppCompatActivity() {
 
+    private var mOptionsMenu: Menu? = null
     private val RESULT_CODE = 3
     private var modal_showing = false
+    private var selecting = false
+    private var selected = ArrayList<Int>()
+    private var deleteId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,11 +76,20 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        finish()
+        if (selecting) {
+            title = resources.getString(R.string.history_activity);
+            for (item in selected){
+
+            }
+            selected.clear()
+            mOptionsMenu?.removeItem(0)
+        }
+        else finish()
         return true
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        mOptionsMenu = menu;
         menuInflater.inflate(R.menu.history_option_menu, menu)
         return true
     }
@@ -110,12 +126,27 @@ class HistoryActivity : AppCompatActivity() {
                 rateMyApp()
                 true
             }
+            deleteId -> {
+                Log.d("MENU", "DELETE")
+                AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(resources.getString(R.string.erase_history))
+                    .setMessage(resources.getString(R.string.msg_erase_history))
+                    .setPositiveButton(resources.getString(R.string.yes)
+                    ) { dialog, which ->
+                        run {
+                            //clearHistory()
+                        }}
+                    .setNegativeButton(resources.getString(R.string.no), null)
+                    .show()
+                true
+            }
             else -> false
         }
     }
 
     private fun rateMyApp() {
-        val uri: Uri = Uri.parse("market://details?id=" + applicationContext.getPackageName())
+        val uri: Uri = Uri.parse("market://details?id=" + applicationContext.packageName)
         val goToMarket = Intent(Intent.ACTION_VIEW, uri)
         // To count with Play market backstack, After pressing back button,
         // to taken back to our application, we need to add following flags to intent.
@@ -130,7 +161,7 @@ class HistoryActivity : AppCompatActivity() {
             startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.getPackageName())
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.packageName)
                 )
             )
         }
@@ -154,36 +185,78 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private fun displayHistoryItems(items:JSONArray) {
-        //val listItems = arrayOfNulls<String>(items.length())
         val listItems = JSONArray()
         for (i in items.length()-1 downTo 0) {
             val item: JSONObject = items.getJSONObject(i)
-            //listItems[i] = item.get("Text") as String?
             listItems.put(item)
         }
 
-        //val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listItems)
         val adapter = HistoryAdapter(this, listItems)
         history_list_view.adapter = adapter
 
         // Short press
         history_list_view.setOnItemClickListener { parent, view, position, id ->
-            val item: JSONObject = adapter.getItem(position) as JSONObject // The item that was clicked
+            if(selecting) {
+                if (position in selected){
+                    selected.remove(position)
+                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
+                    view.setBackgroundColor(Color.parseColor("#0002AAF6"));
+                    if (selected.size == 0) {
+                        mOptionsMenu?.removeItem(0)
+                        selecting = false
+                        title = resources.getString(R.string.history_activity);
+                    }
+                }
+                else{
+                    selected.add(position)
+                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
+                    view.setBackgroundColor(Color.parseColor("#8002AAF6"));
+                }
+            }
+            else {
+                val item: JSONObject = adapter.getItem(position) as JSONObject // The item that was clicked
 
-            val text = item.get("Text").toString()
+                val text = item.get("Text").toString()
 
-            // Switch to resultActivity
-            val i = Intent(applicationContext, ResultActivity::class.java)
-            i.putExtra("imageUri", item.get("Uri") as String?)
-            i.putExtra("text", item.get("Text") as String?)
-            startActivity(i)
+                // Switch to resultActivity
+                val i = Intent(applicationContext, ResultActivity::class.java)
+                i.putExtra("imageUri", item.get("Uri") as String?)
+                i.putExtra("text", item.get("Text") as String?)
+                startActivity(i)
+            }
         }
 
         // Long press
         history_list_view.setOnItemLongClickListener { parent, view, position, id ->
-            val element = adapter.getItem(position) // The item that was clicked
             Log.d("HISTORY", "Long press")
+            if (selecting) {
+                selecting = false
+                title = resources.getString(R.string.history_activity);
+                for (item in selected){
 
+                }
+                selected.clear()
+                mOptionsMenu?.removeItem(0)
+            }
+            else {
+                selecting = true
+                selected.add(position)
+                title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
+                view.setBackgroundColor(Color.parseColor("#8002AAF6"));
+                mOptionsMenu?.add(0, 0, 0, "Delete")?.setIcon(R.drawable.bin_24)
+                    ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                deleteId = mOptionsMenu?.findItem(0)?.itemId!!
+
+                /*
+                var drawable: Drawable? = mOptionsMenu?.getItem(0)?.icon
+
+                drawable = DrawableCompat.wrap(drawable!!)
+                DrawableCompat.setTint(drawable, Color.parseColor("#ffffff"))
+                mOptionsMenu?.findItem(0)?.icon = drawable
+                 */
+            }
+
+            /*
             val item: JSONObject = adapter.getItem(position) as JSONObject // The item that was clicked
             val text = item.get("Text").toString()
 
@@ -201,6 +274,7 @@ class HistoryActivity : AppCompatActivity() {
             val window = d.getWindow();
             window?.setLayout((w*0.8).toInt(), (h*0.75).toInt())
             d.show()
+            */
 
             true
         }

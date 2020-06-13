@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,6 +20,8 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
+import androidx.camera.core.AspectRatio.RATIO_16_9
+import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var flash_state = FLASH_MODE.OFF
+    private val REQUEST_IMAGE_ALBUM_ACCESS = 2
     private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,12 +60,17 @@ class MainActivity : AppCompatActivity() {
         //set content view AFTER ABOVE sequence (to avoid crash)
         setContentView(R.layout.activity_main)
 
-        // Request camera permissions
+        // Request camera permission
         if (allPermissionsGranted()) {
             startCamera()
         } else {
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+        }
+
+        // Request external storage permission
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_IMAGE_ALBUM_ACCESS)
         }
 
         // Setup the listener for take photo button
@@ -85,10 +94,16 @@ class MainActivity : AppCompatActivity() {
 
         // Gallery button
         gallery_button.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "image/*"
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivityForResult(intent, REQUEST_SELECT_IMAGE_IN_ALBUM)
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_SELECT_IMAGE_IN_ALBUM)
+            }
+            else{
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "image/*"
+                if (intent.resolveActivity(packageManager) != null) {
+                    startActivityForResult(intent, REQUEST_SELECT_IMAGE_IN_ALBUM)
+                }
             }
         }
 
@@ -140,11 +155,25 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        startCamera()
+        // Request camera permission
+        if (allPermissionsGranted()) {
+            startCamera()
+        } else {
+            ActivityCompat.requestPermissions(
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+        }
 
         blur.visibility = View.INVISIBLE
         loading_anim.visibility = View.GONE
         steady.visibility = View.INVISIBLE
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            takePhoto()
+            return true
+        }
+        return false
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -231,22 +260,26 @@ class MainActivity : AppCompatActivity() {
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
             // Preview
-            preview = Preview.Builder().build()
+            preview = Preview.Builder()
+                .setTargetAspectRatio(RATIO_16_9)
+                .build()
 
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setTargetAspectRatio(RATIO_16_9)
                 .build()
 
             // Select back camera
-            val cameraSelector = CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
+            val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build()
 
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
 
                 // Bind use cases to camera
-                camera = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture)
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
                 preview?.setSurfaceProvider(viewFinder.createSurfaceProvider(camera?.cameraInfo))
             } catch(exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
@@ -336,7 +369,29 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this,
                     resources.getString(R.string.permission_not_granted),
                     Toast.LENGTH_SHORT).show()
-                finish()
+                ActivityCompat.requestPermissions(
+                    this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+            }
+        }
+        else if (requestCode == REQUEST_IMAGE_ALBUM_ACCESS) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this,
+                    resources.getString(R.string.permission_not_granted),
+                    Toast.LENGTH_SHORT).show()
+            }
+        }
+        // Access with intent to open the gallery right after
+        else if (requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this,
+                    resources.getString(R.string.permission_not_granted),
+                    Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "image/*"
+                if (intent.resolveActivity(packageManager) != null) {
+                    startActivityForResult(intent, REQUEST_SELECT_IMAGE_IN_ALBUM)
+                }
             }
         }
     }

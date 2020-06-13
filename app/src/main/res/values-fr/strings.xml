@@ -61,4 +61,7 @@
     <string name="app_version">1.0</string>
     <string name="version">Version</string>
     <string name="sure_exit">Êtes-vous sûr de vouloir quitter ?</string>
+    <string name="volume_down_title">Utiliser le bouton volume bas pour captuer une image</string>
+    <string name="image_history_title">Supprimer les images de l\'appareil lors de l\'effacement de l\'historique</string>
+    <string name="selecting">item(s) sélectioné(s)</string>
 </resources>

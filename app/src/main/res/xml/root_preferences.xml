@@ -2,25 +2,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:theme="@style/SettingsFragmentStyle" >
 
-    <!--
+
     <PreferenceCategory app:title="@string/general_header">
 
-        <ListPreference
-            app:defaultValue="English"
-            app:entries="@array/languages_entries"
-            app:entryValues="@array/languages_values"
-            app:key="language"
-            app:title="@string/language_title"
-            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:key="volume_down_capture"
+            app:title="@string/volume_down_title"
+            app:defaultValue="true"/>
 
     </PreferenceCategory>
-    -->
 
     <PreferenceCategory app:title="@string/history_header">
 
         <SwitchPreferenceCompat
             app:key="history"
             app:title="@string/history_title"
+            app:defaultValue="true"/>
+
+        <SwitchPreferenceCompat
+            app:key="image_history"
+            app:title="@string/image_history_title"
             app:defaultValue="true"/>
 
     </PreferenceCategory>
