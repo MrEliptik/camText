@@ -4,18 +4,15 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaActionSound
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.util.DisplayMetrics
 import android.util.Log
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +21,7 @@ import androidx.camera.core.AspectRatio.RATIO_16_9
 import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.core.FocusMeteringAction
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
@@ -62,7 +60,10 @@ class MainActivity : AppCompatActivity() {
 
         // Request camera permission
         if (allPermissionsGranted()) {
-            startCamera()
+            viewFinder.post {
+                startCamera()
+                setUpTapToFocus()
+            }
         } else {
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
@@ -157,7 +158,10 @@ class MainActivity : AppCompatActivity() {
 
         // Request camera permission
         if (allPermissionsGranted()) {
-            startCamera()
+            viewFinder.post {
+                startCamera()
+                setUpTapToFocus()
+            }
         } else {
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
@@ -252,7 +256,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun aspectRatio(width: Int, height: Int): Int {
+        val previewRatio = kotlin.math.max(width, height).toDouble() / kotlin.math.min(width, height)
+        if (kotlin.math.abs(previewRatio - RATIO_4_3_VALUE) <= kotlin.math.abs(previewRatio - RATIO_16_9_VALUE)) {
+            return RATIO_4_3
+        }
+        return RATIO_16_9
+    }
+
+    private fun setUpTapToFocus() {
+        viewFinder.setOnTouchListener { _, event ->
+            Log.d("CAMERA", event.toString())
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                val factory = SurfaceOrientedMeteringPointFactory(viewFinder.width.toFloat(), viewFinder.height.toFloat())
+                val point = factory.createPoint(event.x, event.y)
+                val action =  FocusMeteringAction.Builder(point).build()
+                val cameraControl = camera?.cameraControl
+                cameraControl?.startFocusAndMetering(action)
+                return@setOnTouchListener true
+            }
+            else return@setOnTouchListener false
+        }
+    }
+
     private fun startCamera() {
+        val metrics = DisplayMetrics().also {
+            viewFinder.display.getRealMetrics(it)
+        }
+        val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener(Runnable {
@@ -261,12 +293,12 @@ class MainActivity : AppCompatActivity() {
 
             // Preview
             preview = Preview.Builder()
-                .setTargetAspectRatio(RATIO_16_9)
+                .setTargetAspectRatio(screenAspectRatio)
                 .build()
 
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY)
-                .setTargetAspectRatio(RATIO_16_9)
+                .setTargetAspectRatio(screenAspectRatio)
                 .build()
 
             // Select back camera
@@ -281,6 +313,7 @@ class MainActivity : AppCompatActivity() {
                 // Bind use cases to camera
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
                 preview?.setSurfaceProvider(viewFinder.createSurfaceProvider(camera?.cameraInfo))
+
             } catch(exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
@@ -411,6 +444,8 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "CamText"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
+        private const val RATIO_4_3_VALUE = 4.0 / 3.0
+        private const val RATIO_16_9_VALUE = 16.0 / 9.0
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 }
