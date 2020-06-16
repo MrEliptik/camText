@@ -64,4 +64,6 @@
     <string name="volume_down_title">Utiliser le bouton volume bas pour captuer une image</string>
     <string name="image_history_title">Supprimer les images de l\'appareil lors de l\'effacement de l\'historique</string>
     <string name="selecting">item(s) sélectioné(s)</string>
+    <string name="sources">Sources</string>
+    <string name="icon_ref">Icones</string>
 </resources>

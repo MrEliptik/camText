@@ -71,4 +71,6 @@
     <string name="volume_down_title">Capture photo on volume down press</string>
     <string name="image_history_title">Delete images on device when erasing history</string>
     <string name="selecting">item(s) selected</string>
+    <string name="sources">Sources</string>
+    <string name="icon_ref">Icons</string>
 </resources>
