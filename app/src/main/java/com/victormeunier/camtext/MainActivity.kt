@@ -6,8 +6,10 @@ import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.media.MediaActionSound
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.DisplayMetrics
@@ -47,8 +49,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var flash_state = FLASH_MODE.OFF
-    private val REQUEST_IMAGE_ALBUM_ACCESS = 2
     private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
+
+    val PERMISSIONS_REQUEST_CODE = 15
+    val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,20 +62,13 @@ class MainActivity : AppCompatActivity() {
         //set content view AFTER ABOVE sequence (to avoid crash)
         setContentView(R.layout.activity_main)
 
-        // Request camera permission
-        if (allPermissionsGranted()) {
+        if (shouldRequestPermissionsAtRuntime() && !arePermissionsGranted()) {
+            requestPermissions()
+        } else {
             viewFinder.post {
                 startCamera()
                 setUpTapToFocus()
             }
-        } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-        }
-
-        // Request external storage permission
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_IMAGE_ALBUM_ACCESS)
         }
 
         // Setup the listener for take photo button
@@ -157,19 +154,31 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         // Request camera permission
-        if (allPermissionsGranted()) {
+        if (shouldRequestPermissionsAtRuntime() && !arePermissionsGranted()) {
+            requestPermissions()
+        } else {
             viewFinder.post {
                 startCamera()
                 setUpTapToFocus()
             }
-        } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
         blur.visibility = View.INVISIBLE
         loading_anim.visibility = View.GONE
         steady.visibility = View.INVISIBLE
+    }
+
+    private fun shouldRequestPermissionsAtRuntime(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    }
+
+    private fun arePermissionsGranted(): Boolean {
+        return PERMISSIONS.all { ContextCompat.checkSelfPermission(applicationContext, it) == PERMISSION_GRANTED }
+    }
+
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+            this, PERMISSIONS, REQUEST_CODE_PERMISSIONS)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -395,36 +404,19 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                Toast.makeText(this,
-                    resources.getString(R.string.permission_not_granted),
-                    Toast.LENGTH_SHORT).show()
-                ActivityCompat.requestPermissions(
-                    this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-            }
-        }
-        else if (requestCode == REQUEST_IMAGE_ALBUM_ACCESS) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this,
-                    resources.getString(R.string.permission_not_granted),
-                    Toast.LENGTH_SHORT).show()
-            }
-        }
-        // Access with intent to open the gallery right after
-        else if (requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this,
-                    resources.getString(R.string.permission_not_granted),
-                    Toast.LENGTH_SHORT).show()
-            } else {
-                val intent = Intent(Intent.ACTION_GET_CONTENT)
-                intent.type = "image/*"
-                if (intent.resolveActivity(packageManager) != null) {
-                    startActivityForResult(intent, REQUEST_SELECT_IMAGE_IN_ALBUM)
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            if (arePermissionsGranted()) {
+                viewFinder.post {
+                    startCamera()
+                    setUpTapToFocus()
                 }
+            } else {
+                Toast.makeText(this,
+                    resources.getString(R.string.permission_not_granted),
+                    Toast.LENGTH_SHORT).show()
+                finish()
             }
         }
     }
