@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -15,15 +14,16 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import kotlinx.android.synthetic.main.activity_history.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.stream.IntStream.range
 
 
 class HistoryActivity : AppCompatActivity() {
 
+    private lateinit var listItems: JSONArray
+    private lateinit var adapter: HistoryAdapter
     private var mOptionsMenu: Menu? = null
     private val RESULT_CODE = 3
     private var modal_showing = false
@@ -42,7 +42,7 @@ class HistoryActivity : AppCompatActivity() {
 
         clear_button.setOnClickListener {
             AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.alert_24)
                 .setTitle("Erasing history")
                 .setMessage("Are you sure you want to erase history?")
                 .setPositiveButton("Yes"
@@ -77,15 +77,29 @@ class HistoryActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         if (selecting) {
+            selecting = false
             title = resources.getString(R.string.history_activity);
             for (item in selected){
-
+                history_list_view.setItemChecked(item, false)
             }
             selected.clear()
             mOptionsMenu?.removeItem(0)
         }
         else finish()
         return true
+    }
+
+    override fun onBackPressed() {
+        if (selecting) {
+            selecting = false
+            title = resources.getString(R.string.history_activity);
+            for (item in selected){
+                history_list_view.setItemChecked(item, false)
+            }
+            selected.clear()
+            mOptionsMenu?.removeItem(0)
+        }
+        else super.onBackPressed()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -105,7 +119,7 @@ class HistoryActivity : AppCompatActivity() {
             R.id.action_erase -> {
                 Log.d("MENU", "ERASE")
                 AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.alert_24)
                     .setTitle(resources.getString(R.string.erase_history))
                     .setMessage(resources.getString(R.string.msg_erase_history))
                     .setPositiveButton(resources.getString(R.string.yes)
@@ -129,13 +143,20 @@ class HistoryActivity : AppCompatActivity() {
             deleteId -> {
                 Log.d("MENU", "DELETE")
                 AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.alert_24)
                     .setTitle(resources.getString(R.string.erase_history))
                     .setMessage(resources.getString(R.string.msg_erase_history))
                     .setPositiveButton(resources.getString(R.string.yes)
                     ) { dialog, which ->
                         run {
-                            //clearHistory()
+                            clearHistory(selected)
+                            selecting = false
+                            title = resources.getString(R.string.history_activity);
+                            for (item in selected){
+                                history_list_view.setItemChecked(item, false)
+                            }
+                            selected.clear()
+                            mOptionsMenu?.removeItem(0)
                         }}
                     .setNegativeButton(resources.getString(R.string.no), null)
                     .show()
@@ -167,12 +188,38 @@ class HistoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun clearHistory() {
-        history_list_view.adapter = null
-        val sharedPref = getSharedPreferences("appData", Context.MODE_PRIVATE)
-        var editPref = sharedPref.edit()
-        editPref.remove("history")
-        editPref.apply()
+    private fun clearHistory(selected: ArrayList<Int>? = null) {
+        if (selected != null) {
+            // get the items as JSONArray
+            val arr = getHistoryItems()
+
+            // Delete selected items
+            // Delete selected items (careful: position is in reverse compared
+            // to the JSONArray)
+            for (i in selected) {
+                arr.remove((arr.length() -1) - i)
+            }
+
+            // Put back in sharedpreference
+            val sharedPref = getSharedPreferences("appData", Context.MODE_PRIVATE)
+            val prefEditor = sharedPref.edit()
+            prefEditor.putString("history", arr.toString())
+            prefEditor.apply() // handle writing in the background
+
+            // Update data
+            for (i in selected) {
+                listItems.remove(i)
+
+            }
+            adapter.notifyDataSetChanged()
+        }
+        else {
+            history_list_view.adapter = null
+            val sharedPref = getSharedPreferences("appData", Context.MODE_PRIVATE)
+            var editPref = sharedPref.edit()
+            editPref.remove("history")
+            editPref.apply()
+        }
     }
 
     private fun getHistoryItems(): JSONArray {
@@ -185,13 +232,13 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private fun displayHistoryItems(items:JSONArray) {
-        val listItems = JSONArray()
+        listItems = JSONArray()
         for (i in items.length()-1 downTo 0) {
             val item: JSONObject = items.getJSONObject(i)
             listItems.put(item)
         }
 
-        val adapter = HistoryAdapter(this, listItems)
+        adapter = HistoryAdapter(this, listItems)
         history_list_view.adapter = adapter
 
         // Short press
@@ -200,7 +247,8 @@ class HistoryActivity : AppCompatActivity() {
                 if (position in selected){
                     selected.remove(position)
                     title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
-                    view.setBackgroundColor(Color.parseColor("#0002AAF6"));
+                    //view.setBackgroundColor(Color.parseColor("#0002AAF6"));
+                    history_list_view.setItemChecked(position, false)
                     if (selected.size == 0) {
                         mOptionsMenu?.removeItem(0)
                         selecting = false
@@ -210,7 +258,8 @@ class HistoryActivity : AppCompatActivity() {
                 else{
                     selected.add(position)
                     title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
-                    view.setBackgroundColor(Color.parseColor("#8002AAF6"));
+                    //view.setBackgroundColor(Color.parseColor("#8002AAF6"));
+                    history_list_view.setItemChecked(position, true)
                 }
             }
             else {
@@ -223,6 +272,8 @@ class HistoryActivity : AppCompatActivity() {
                 i.putExtra("imageUri", item.get("Uri") as String?)
                 i.putExtra("text", item.get("Text") as String?)
                 startActivity(i)
+                history_list_view.setItemChecked(position, false)
+                true
             }
         }
 
@@ -233,7 +284,7 @@ class HistoryActivity : AppCompatActivity() {
                 selecting = false
                 title = resources.getString(R.string.history_activity);
                 for (item in selected){
-
+                    history_list_view.setItemChecked(item, false)
                 }
                 selected.clear()
                 mOptionsMenu?.removeItem(0)
@@ -242,7 +293,8 @@ class HistoryActivity : AppCompatActivity() {
                 selecting = true
                 selected.add(position)
                 title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
-                view.setBackgroundColor(Color.parseColor("#8002AAF6"));
+                //view.setBackgroundColor(Color.parseColor("#8002AAF6"));
+                history_list_view.setItemChecked(position, true)
                 mOptionsMenu?.add(0, 0, 0, "Delete")?.setIcon(R.drawable.bin_24)
                     ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
                 deleteId = mOptionsMenu?.findItem(0)?.itemId!!

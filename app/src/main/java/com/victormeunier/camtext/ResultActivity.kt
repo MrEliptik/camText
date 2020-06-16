@@ -259,7 +259,6 @@ class ResultActivity : AppCompatActivity() {
         entry.put("Text", text)
         entry.put("Date", currentDate)
         json.put(entry)
-
         prefEditor.putString("history", json.toString())
         prefEditor.apply() // handle writing in the background
     }

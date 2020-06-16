@@ -45,4 +45,8 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="activated" parent="AppTheme">
+        <item name="android:background">?android:attr/activatedBackgroundIndicator</item>
+    </style>
 </resources>

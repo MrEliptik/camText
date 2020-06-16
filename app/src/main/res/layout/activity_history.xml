@@ -26,7 +26,8 @@
         android:id="@+id/history_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/history_no_result" />
+        android:text="@string/history_no_result"
+        android:choiceMode="multipleChoice" />
 
     <ImageButton
         android:id="@+id/clear_button"
