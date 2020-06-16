@@ -45,14 +45,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
 
     enum class FLASH_MODE {
-        ON, OFF, AUTO
+        AUTO,
+        ON,
+        OFF
     }
 
-    private var flash_state = FLASH_MODE.OFF
+    private var flash_state = FLASH_MODE.AUTO
     private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
 
-    val PERMISSIONS_REQUEST_CODE = 15
-    val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    private val PERMISSIONS_REQUEST_CODE = 15
+    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+    private var start: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,12 +116,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         flash_button.setOnClickListener {
-            if (flash_state == FLASH_MODE.OFF) {
+            if (flash_state == FLASH_MODE.AUTO) {
                 flash_state = FLASH_MODE.ON
                 flash_button.setImageResource(R.drawable.flash_active_48)
                 flash_button.invalidate()
                 if (camera!!.cameraInfo.hasFlashUnit()) {
                     camera!!.cameraControl.enableTorch(true)
+                    // re-bind use case to include change
+                    imageCapture?.flashMode = FLASH_MODE.OFF.ordinal
                 }
             }
             else if(flash_state == FLASH_MODE.ON){
@@ -126,13 +132,18 @@ class MainActivity : AppCompatActivity() {
                 flash_button.invalidate()
                 if (camera!!.cameraInfo.hasFlashUnit()) {
                     camera!!.cameraControl.enableTorch(false)
+                    // re-bind use case to include change
+                    imageCapture?.flashMode = flash_state.ordinal
                 }
             }
-            // TODO: re-implement with AUTO mode
             else {
                 flash_state = FLASH_MODE.AUTO
                 flash_button.setImageResource(R.drawable.flash_auto_48)
                 flash_button.invalidate()
+                if (camera!!.cameraInfo.hasFlashUnit()) {
+                    // re-bind use case to include change
+                    imageCapture?.flashMode = flash_state.ordinal
+                }
             }
         }
 
@@ -166,6 +177,10 @@ class MainActivity : AppCompatActivity() {
         blur.visibility = View.INVISIBLE
         loading_anim.visibility = View.GONE
         steady.visibility = View.INVISIBLE
+
+        flash_state = FLASH_MODE.AUTO
+        flash_button.setImageResource(R.drawable.flash_auto_48)
+        flash_button.invalidate()
     }
 
     private fun shouldRequestPermissionsAtRuntime(): Boolean {
@@ -232,7 +247,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rateMyApp() {
-        val uri: Uri = Uri.parse("market://details?id=" + applicationContext.getPackageName())
+        val uri: Uri = Uri.parse("market://details?id=" + applicationContext.packageName)
         val goToMarket = Intent(Intent.ACTION_VIEW, uri)
         // To count with Play market backstack, After pressing back button,
         // to taken back to our application, we need to add following flags to intent.
@@ -247,7 +262,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.getPackageName())
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.packageName)
                 )
             )
         }
@@ -308,6 +323,7 @@ class MainActivity : AppCompatActivity() {
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY)
                 .setTargetAspectRatio(screenAspectRatio)
+                .setFlashMode(FLASH_MODE.AUTO.ordinal)
                 .build()
 
             // Select back camera
@@ -331,6 +347,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun takePhoto() {
+        start = System.currentTimeMillis()
+
         // Disable button to prevent multiple takes
         camera_capture_button.isEnabled = false
 
@@ -346,23 +364,6 @@ class MainActivity : AppCompatActivity() {
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        val sound = MediaActionSound()
-        sound.play(MediaActionSound.SHUTTER_CLICK)
-
-        //shutterEffect.visibility = View.VISIBLE
-
-        // You can unbind from any UseCase
-        CameraX.unbind(preview);
-        // In this way TextureView will hold the last frame
-
-        blur.visibility = View.VISIBLE
-        loading_anim.visibility = View.VISIBLE
-        steady.visibility = View.VISIBLE
-
-        val handler = Handler()
-        val runnable = Runnable { shutterEffect.visibility = View.INVISIBLE }
-        //handler.postDelayed(runnable, 150)
-
         // Setup image capture listener which is triggered after photo has
         // been taken
         imageCapture.takePicture(
@@ -372,6 +373,22 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    // Enable button
+                    camera_capture_button.isEnabled = true
+
+                    val sound = MediaActionSound()
+                    sound.play(MediaActionSound.SHUTTER_CLICK)
+
+                    // You can unbind from any UseCase
+                    CameraX.unbind(preview);
+                    // In this way TextureView will hold the last frame
+
+                    blur.visibility = View.VISIBLE
+                    loading_anim.visibility = View.VISIBLE
+                    steady.visibility = View.VISIBLE
+
+                    val end = (System.currentTimeMillis() - start).toString()
+                    Log.d("CAMERA", "Time: $end ms")
                     // Disable button
                     camera_capture_button.isEnabled = true
 
@@ -387,6 +404,35 @@ class MainActivity : AppCompatActivity() {
                     startActivity(i)
                 }
             })
+
+
+
+/*
+        imageCapture.takePicture(ContextCompat.getMainExecutor(this), object :
+            ImageCapture.OnImageCapturedCallback() {
+                override fun onError(exc: ImageCaptureException) {
+                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                }
+
+                override fun onCaptureSuccess(image: ImageProxy) {
+                    super.onCaptureSuccess(image)
+                    val end = (System.currentTimeMillis() - start).toString()
+                    Log.d("CAMERA", "Time: $end ms")
+
+                    // Disable button
+                    camera_capture_button.isEnabled = true
+
+                    // You can unbind from any UseCase
+                    CameraX.unbind(preview);
+                    // In this way TextureView will hold the last frame
+
+                    blur.visibility = View.VISIBLE
+                    loading_anim.visibility = View.VISIBLE
+                    steady.visibility = View.VISIBLE
+                }
+            })
+*/
+
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

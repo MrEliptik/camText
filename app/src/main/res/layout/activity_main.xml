@@ -103,7 +103,7 @@
         android:backgroundTint="#00FFFFFF"
         android:contentDescription="@string/flash_button"
         android:scaleType="centerInside"
-        android:src="@drawable/flash_deactived_48"
+        android:src="@drawable/flash_auto_48"
         android:tint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/option_button"
