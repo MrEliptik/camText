@@ -1,6 +1,8 @@
 # CamText
 
-<img src="medias/feature_graphics.png" width="800">
+<p align="center">
+    <img src="medias/feature_graphics.png" width="800">
+</p>
 
 ## Screenshots
 

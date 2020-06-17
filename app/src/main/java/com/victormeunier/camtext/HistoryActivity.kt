@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -17,11 +16,11 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_history.*
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.stream.IntStream.range
 
 
 class HistoryActivity : AppCompatActivity() {
 
+    private var selectId: Int = 0
     private lateinit var listItems: JSONArray
     private lateinit var adapter: HistoryAdapter
     private var mOptionsMenu: Menu? = null
@@ -30,6 +29,7 @@ class HistoryActivity : AppCompatActivity() {
     private var selecting = false
     private var selected = ArrayList<Int>()
     private var deleteId: Int = 0
+    private var allSelected: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +84,7 @@ class HistoryActivity : AppCompatActivity() {
             }
             selected.clear()
             mOptionsMenu?.removeItem(0)
+            mOptionsMenu?.removeItem(1)
         }
         else finish()
         return true
@@ -98,6 +99,7 @@ class HistoryActivity : AppCompatActivity() {
             }
             selected.clear()
             mOptionsMenu?.removeItem(0)
+            mOptionsMenu?.removeItem(1)
         }
         else super.onBackPressed()
     }
@@ -151,15 +153,41 @@ class HistoryActivity : AppCompatActivity() {
                         run {
                             clearHistory(selected)
                             selecting = false
+                            allSelected = false
                             title = resources.getString(R.string.history_activity);
                             for (item in selected){
                                 history_list_view.setItemChecked(item, false)
                             }
                             selected.clear()
                             mOptionsMenu?.removeItem(0)
+                            mOptionsMenu?.removeItem(1)
                         }}
                     .setNegativeButton(resources.getString(R.string.no), null)
                     .show()
+                true
+
+            }
+            selectId -> {
+                Log.d("MENU", "SELECT")
+                if (allSelected){
+                    for (item in 0 until listItems.length()){
+                        history_list_view.setItemChecked(item, false)
+                    }
+                    allSelected = false
+                    selected.clear()
+                    mOptionsMenu?.findItem(0)?.setIcon(R.drawable.select_all_24)
+                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting)
+                }
+                else {
+                    for (item in 0 until listItems.length()){
+                        if (item in selected) continue
+                        history_list_view.setItemChecked(item, true)
+                        selected.add(item)
+                    }
+                    allSelected = true
+                    mOptionsMenu?.findItem(0)?.setIcon(R.drawable.unselect_all_24)
+                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting)
+                }
                 true
             }
             else -> false
@@ -192,25 +220,41 @@ class HistoryActivity : AppCompatActivity() {
         if (selected != null) {
             // get the items as JSONArray
             val arr = getHistoryItems()
+            var size = arr.length()
+            var newArr = JSONArray()
 
             // Delete selected items
             // Delete selected items (careful: position is in reverse compared
             // to the JSONArray)
-            for (i in selected) {
-                arr.remove((arr.length() -1) - i)
+            for (i in (size-1) downTo 0) {
+                val item = arr.get(i)
+                if ((size-1)-i !in selected){
+                    newArr.put(item)
+                }
+                //arr.remove((size-1) - i)
             }
 
             // Put back in sharedpreference
             val sharedPref = getSharedPreferences("appData", Context.MODE_PRIVATE)
             val prefEditor = sharedPref.edit()
-            prefEditor.putString("history", arr.toString())
+            prefEditor.putString("history", newArr.toString())
             prefEditor.apply() // handle writing in the background
 
-            // Update data
-            for (i in selected) {
-                listItems.remove(i)
 
+            var newListItems = JSONArray()
+            size = listItems.length()
+            // Update data
+
+            for (i in 0 until size) {
+                val item = listItems.get(i)
+                if (i !in selected) {
+                    newListItems.put(item)
+                }
             }
+
+            listItems = JSONArray(newListItems.toString())
+            adapter = HistoryAdapter(this, listItems)
+            history_list_view.adapter = adapter
             adapter.notifyDataSetChanged()
         }
         else {
@@ -246,10 +290,10 @@ class HistoryActivity : AppCompatActivity() {
             if(selecting) {
                 if (position in selected){
                     selected.remove(position)
-                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
-                    //view.setBackgroundColor(Color.parseColor("#0002AAF6"));
+                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting)
                     history_list_view.setItemChecked(position, false)
                     if (selected.size == 0) {
+                        mOptionsMenu?.removeItem(1)
                         mOptionsMenu?.removeItem(0)
                         selecting = false
                         title = resources.getString(R.string.history_activity);
@@ -257,8 +301,7 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 else{
                     selected.add(position)
-                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
-                    //view.setBackgroundColor(Color.parseColor("#8002AAF6"));
+                    title = selected.size.toString() +" "+ resources.getString(R.string.selecting)
                     history_list_view.setItemChecked(position, true)
                 }
             }
@@ -287,6 +330,7 @@ class HistoryActivity : AppCompatActivity() {
                     history_list_view.setItemChecked(item, false)
                 }
                 selected.clear()
+                mOptionsMenu?.removeItem(1)
                 mOptionsMenu?.removeItem(0)
             }
             else {
@@ -295,17 +339,12 @@ class HistoryActivity : AppCompatActivity() {
                 title = selected.size.toString() +" "+ resources.getString(R.string.selecting);
                 //view.setBackgroundColor(Color.parseColor("#8002AAF6"));
                 history_list_view.setItemChecked(position, true)
-                mOptionsMenu?.add(0, 0, 0, "Delete")?.setIcon(R.drawable.bin_24)
+                mOptionsMenu?.add(0, 0, 0, "Select all")?.setIcon(R.drawable.select_all_24)
                     ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-                deleteId = mOptionsMenu?.findItem(0)?.itemId!!
-
-                /*
-                var drawable: Drawable? = mOptionsMenu?.getItem(0)?.icon
-
-                drawable = DrawableCompat.wrap(drawable!!)
-                DrawableCompat.setTint(drawable, Color.parseColor("#ffffff"))
-                mOptionsMenu?.findItem(0)?.icon = drawable
-                 */
+                selectId = mOptionsMenu?.findItem(0)?.itemId!!
+                mOptionsMenu?.add(0, 1, 1, "Delete")?.setIcon(R.drawable.bin_24)
+                    ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                deleteId = mOptionsMenu?.findItem(1)?.itemId!!
             }
 
             /*
