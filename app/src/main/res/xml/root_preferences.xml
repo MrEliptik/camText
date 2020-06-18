@@ -8,6 +8,7 @@
         <SwitchPreferenceCompat
             app:key="volume_down_capture"
             app:title="@string/volume_down_title"
+            app:summary="@string/volume_down_title"
             app:defaultValue="true"/>
 
     </PreferenceCategory>
@@ -17,11 +18,13 @@
         <SwitchPreferenceCompat
             app:key="history"
             app:title="@string/history_title"
+            app:summary="@string/history_title"
             app:defaultValue="true"/>
 
         <SwitchPreferenceCompat
             app:key="image_history"
             app:title="@string/image_history_title"
+            app:summary="@string/image_history_title"
             app:defaultValue="true"/>
 
     </PreferenceCategory>
