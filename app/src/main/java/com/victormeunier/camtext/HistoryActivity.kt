@@ -13,9 +13,11 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_history.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 
 
 class HistoryActivity : AppCompatActivity() {
@@ -217,6 +219,7 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private fun clearHistory(selected: ArrayList<Int>? = null) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this /* Activity context */)
         if (selected != null) {
             // get the items as JSONArray
             val arr = getHistoryItems()
@@ -227,9 +230,16 @@ class HistoryActivity : AppCompatActivity() {
             // Delete selected items (careful: position is in reverse compared
             // to the JSONArray)
             for (i in (size-1) downTo 0) {
-                val item = arr.get(i)
+                val item = arr.get(i) as JSONObject
                 if ((size-1)-i !in selected){
                     newArr.put(item)
+                }
+                // Delete image if needed
+                else {
+                    if (sharedPreferences.getBoolean("image_history", true)) {
+                        val file = File(item.get("Uri").toString())
+                        file?.delete()
+                    }
                 }
                 //arr.remove((size-1) - i)
             }
@@ -261,6 +271,21 @@ class HistoryActivity : AppCompatActivity() {
             history_list_view.adapter = null
             val sharedPref = getSharedPreferences("appData", Context.MODE_PRIVATE)
             var editPref = sharedPref.edit()
+
+            val arr = getHistoryItems()
+            var size = arr.length()
+
+            // Delete selected items
+            // Delete selected items (careful: position is in reverse compared
+            // to the JSONArray)
+            if (sharedPreferences.getBoolean("image_history", true)) {
+                for (i in 0 until size) {
+                    val item = arr.get(i) as JSONObject
+                    // Remove image if needed
+                    val file = File(item.get("Uri").toString())
+                    file?.delete()
+                }
+            }
             editPref.remove("history")
             editPref.apply()
         }
