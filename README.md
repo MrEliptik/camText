@@ -8,5 +8,6 @@
 
 <img src="medias/capture.png" width="200">
 <img src="medias/result_book_page.png" width="200">
-<img src="medias/about.jpg" width="200">
-<img src="medias/settings.jpg" width="200">
+<img src="medias/history.png" width="200">
+<img src="medias/about.png" width="200">
+<img src="medias/settings.png" width="200">
