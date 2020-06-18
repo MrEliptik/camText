@@ -205,7 +205,7 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun rateMyApp() {
-        val uri: Uri = Uri.parse("market://details?id=" + applicationContext.getPackageName())
+        val uri: Uri = Uri.parse("market://details?id=" + applicationContext.packageName)
         val goToMarket = Intent(Intent.ACTION_VIEW, uri)
         // To count with Play market backstack, After pressing back button,
         // to taken back to our application, we need to add following flags to intent.
@@ -220,7 +220,7 @@ class ResultActivity : AppCompatActivity() {
             startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.getPackageName())
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.packageName)
                 )
             )
         }
