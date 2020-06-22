@@ -74,9 +74,11 @@ class ResultActivity : AppCompatActivity() {
         }
 
         // Translate button
+        /*
         translate_btn.setOnClickListener {
 
         }
+        */
 
         // Capture button
         recapture_btn.setOnClickListener {
