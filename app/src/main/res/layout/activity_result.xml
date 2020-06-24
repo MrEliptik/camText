@@ -45,16 +45,16 @@
         android:id="@+id/loading_panel"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:gravity="center"
-        android:background="@drawable/card_solid"
         android:layout_margin="10dp"
-        android:layout_weight="1" >
+        android:layout_weight="1"
+        android:background="@drawable/card_solid">
 
         <ProgressBar
             android:id="@+id/loading_anim"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_centerVertical="false"
             android:indeterminate="true"
             android:indeterminateTint="#03A9F4"
             android:progressTint="#03A9F4" />
@@ -69,9 +69,9 @@
                 android:id="@+id/ocr_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 android:inputType="text|textMultiLine"
-                android:textColor="#E3E3E3"
-                android:background="@android:color/transparent" />
+                android:textColor="#E3E3E3" />
         </ScrollView>
     </RelativeLayout>
 
