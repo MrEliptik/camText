@@ -3,18 +3,19 @@ package com.victormeunier.camtext
 import MyDrawView
 import android.content.*
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
-import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.google.android.gms.vision.Frame
@@ -23,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_result.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -140,10 +142,36 @@ class ResultActivity : AppCompatActivity() {
             if (extras != null) {
                 var imageUri = Uri.parse(extras.getString("imageUri"))
 
-                val bitmap =
-                    MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, imageUri)
+                //val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, imageUri)
+                //val r = contentResolver
+                //val streamTypes = r.getStreamTypes(imageUri, "*/*")
+                //val descriptor: AssetFileDescriptor? = r.openTypedAssetFileDescriptor( imageUri, streamTypes!![0], null
 
-                val imFrame = Frame.Builder().setBitmap(bitmap).build()
+                //val _is: InputStream = descriptor?.createInputStream()!!
+
+                val inStrem: InputStream? = applicationContext.contentResolver.openInputStream(imageUri)
+                val bitmap: Bitmap = BitmapFactory.decodeStream(inStrem)
+
+                //val bitmap: Bitmap = BitmapFactory.decodeFile(imageUri.path)
+
+                val ei = ExifInterface(imageUri.path)
+                val orientation: Int = ei.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED
+                )
+
+                // -> Some device have the sensor in landscape mode
+                // meaning the image should be rotated for OCR
+                var rotatedBitmap : Bitmap? = null
+                when (orientation) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> rotatedBitmap = rotateImage(bitmap, 90F)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> rotatedBitmap = rotateImage(bitmap, 180F)
+                    ExifInterface.ORIENTATION_ROTATE_270 -> rotatedBitmap = rotateImage(bitmap, 270F)
+                    else -> rotatedBitmap = bitmap
+                }
+
+                // file:///storage/emulated/0/Android/media/com.victormeunier.camtext/CamText/2020-06-24-23-41-32-432.jpg
+                val imFrame = Frame.Builder().setBitmap(rotatedBitmap).build()
                 val textBlocks = textRecognizer.detect(imFrame)
 
                 val stringBuilder = StringBuilder()
@@ -167,6 +195,15 @@ class ResultActivity : AppCompatActivity() {
 
         // TODO: handle text selection
         //handler.postDelayed(runnable, 2000); // Call the handler for the first time.
+    }
+
+    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(
+            source, 0, 0, source.width, source.height,
+            matrix, true
+        )
     }
 
     override fun onSupportNavigateUp(): Boolean {

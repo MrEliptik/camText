@@ -323,11 +323,13 @@ class MainActivity : AppCompatActivity() {
             // Preview
             preview = Preview.Builder()
                 .setTargetAspectRatio(screenAspectRatio)
+                .setTargetRotation(viewFinder.display.rotation)
                 .build()
 
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY)
                 .setTargetAspectRatio(screenAspectRatio)
+                .setTargetRotation(viewFinder.display.rotation)
                 .setFlashMode(FLASH_MODE.AUTO.ordinal)
                 .build()
 
@@ -445,7 +447,7 @@ class MainActivity : AppCompatActivity() {
             baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun getOutputDirectory(): File {
+    private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() } }
         return if (mediaDir != null && mediaDir.exists())
