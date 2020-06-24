@@ -90,7 +90,12 @@ class MainActivity : AppCompatActivity() {
                 .setMessage(resources.getString(R.string.sure_exit))
                 .setCancelable(false)
                 .setPositiveButton(resources.getString(R.string.yes)
-                ) { dialog, id -> finish() }
+                ) { dialog, id ->
+                        val intent = Intent(Intent.ACTION_MAIN)
+                        intent.addCategory(Intent.CATEGORY_HOME)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                }
                 .setNegativeButton(resources.getString(R.string.no), null)
                 .show()
         }
