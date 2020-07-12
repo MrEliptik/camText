@@ -90,34 +90,6 @@ class ResultActivity : AppCompatActivity() {
             startActivityForResult(myIntent, 0)
         }
 
-        val extras = intent.extras
-        if (extras != null) {
-            var imageUri = Uri.parse(extras.getString("imageUri"))
-            //set image captured to image view
-            /*
-            val bitmap: Bitmap = BitmapFactory.decodeFile(imageUri.path)
-            if (bitmap != null) image_view.setImageBitmap(bitmap) else {
-                image_view.setImageResource(R.drawable.image_placeholder)
-            }
-            */
-            try {
-                image_view.setImageURI(imageUri)
-            } catch (e: Throwable) {
-                image_view.setImageResource(R.drawable.image_placeholder)
-            }
-            /*
-            val file = File(imageUri.path)
-            if (file.exists()) {
-                //set image captured to image view
-                image_view.setImageURI(imageUri)
-            }
-            else
-            {
-                image_view.setImageResource(R.drawable.image_placeholder)
-            }
-            */
-        }
-
         // TODO: handle text selection
         /*
         val parent = image_overlay as FrameLayout
@@ -129,35 +101,59 @@ class ResultActivity : AppCompatActivity() {
         myDrawView.layoutParams.height = image_view.layoutParams.height
         */
 
-        // There's an extra "text" when launching this activity from
-        // the history list. We don't need to redo OCR
-        if (extras?.getString("text") != null){
-            ocr_result.setText(extras?.getString("text"))
-            loading_anim.visibility = View.GONE;
-            return
+        val extras = intent.extras
+        if (extras != null) {
+            // There's an extra "text" when launching this activity from
+            // the history list. We don't need to redo OCR
+            if (extras?.getString("text") != null) {
+                ocr_result.setText(extras?.getString("text"))
+                loading_anim.visibility = View.GONE;
+                return
+            }
         }
 
         DoAsync {
             setupOCR()
 
-            val extras = intent.extras
-            if (extras != null) {
-                var imageUri = Uri.parse(extras.getString("imageUri"))
+            var imageUri: Uri? = null
+            when (intent?.action) {
+                // When coming from share event
+                Intent.ACTION_SEND -> {
+                    if (intent.type?.startsWith("image/") == true) {
+                        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
+                            // Update UI to reflect image being shared
+                            //image_view.setImageURI(it)
+                            imageUri = it
+                        }
+                    }
+                }
+                // When coming from other activity
+                else -> {
+                    val extras = intent.extras
+                    if (extras != null) {
+                        imageUri = Uri.parse(extras.getString("imageUri"))
+                    }
+                }
+            }
 
-                //val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, imageUri)
-                //val r = contentResolver
-                //val streamTypes = r.getStreamTypes(imageUri, "*/*")
-                //val descriptor: AssetFileDescriptor? = r.openTypedAssetFileDescriptor( imageUri, streamTypes!![0], null
+            if (imageUri != null) {
+                //set image captured to image view
+                try {
+                    image_view.post {
+                        image_view.setImageURI(imageUri)
+                    }
+                } catch (e: Throwable) {
+                    image_view.post {
+                        image_view.setImageResource(R.drawable.image_placeholder)
+                    }
+                }
 
-                //val _is: InputStream = descriptor?.createInputStream()!!
+                val inStream: InputStream? = applicationContext.contentResolver.openInputStream(
+                    imageUri!!
+                )
+                val bitmap: Bitmap = BitmapFactory.decodeStream(inStream)
 
-                val inStrem: InputStream? = applicationContext.contentResolver.openInputStream(imageUri)
-                val bitmap: Bitmap = BitmapFactory.decodeStream(inStrem)
-
-                //val bitmap: Bitmap = BitmapFactory.decodeFile(imageUri.path)
-
-                //val ei = ExifInterface(getImagePath(imageUri))
-                val ei = ExifInterface(getPath(this, imageUri))
+                val ei = ExifInterface(getPath(this, imageUri!!))
                 val orientation: Int = ei.getAttributeInt(
                     ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_UNDEFINED
@@ -173,7 +169,6 @@ class ResultActivity : AppCompatActivity() {
                     else -> rotatedBitmap = bitmap
                 }
 
-                // file:///storage/emulated/0/Android/media/com.victormeunier.camtext/CamText/2020-06-24-23-41-32-432.jpg
                 val imFrame = Frame.Builder().setBitmap(rotatedBitmap).build()
                 val textBlocks = textRecognizer.detect(imFrame)
 
@@ -186,13 +181,13 @@ class ResultActivity : AppCompatActivity() {
                 ocrResult = stringBuilder.toString()
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this /* Activity context */)
                 if (ocrResult != "" && sharedPreferences.getBoolean("history", true)) {
-                    extras.getString("imageUri")?.let { addHistoryItem(it, ocrResult) }
+                    extras!!.getString("imageUri")?.let { addHistoryItem(it, ocrResult) }
                 }
-            }
 
-            ocr_result.post {
-                loading_anim.visibility = View.GONE;
-                ocr_result.setText(ocrResult)
+                ocr_result.post {
+                    loading_anim.visibility = View.GONE;
+                    ocr_result.setText(ocrResult)
+                }
             }
         }
 

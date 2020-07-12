@@ -34,7 +34,16 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/result_activity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
         <activity android:name="com.victormeunier.camtext.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
