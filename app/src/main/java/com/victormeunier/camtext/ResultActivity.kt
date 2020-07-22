@@ -21,21 +21,20 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.google.android.gms.vision.Frame
-import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
 import kotlinx.android.synthetic.main.activity_result.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.properties.Delegates
 
 
 class ResultActivity : AppCompatActivity() {
 
     private val handler: Handler = Handler()
-    private var textRecognizer by Delegates.notNull<TextRecognizer>()
     private lateinit var myDrawView: MyDrawView
     private var ocrResult: String = ""
 
@@ -113,8 +112,6 @@ class ResultActivity : AppCompatActivity() {
         }
 
         DoAsync {
-            setupOCR()
-
             var imageUri: Uri? = null
             when (intent?.action) {
                 // When coming from share event
@@ -169,25 +166,45 @@ class ResultActivity : AppCompatActivity() {
                     else -> rotatedBitmap = bitmap
                 }
 
-                val imFrame = Frame.Builder().setBitmap(rotatedBitmap).build()
-                val textBlocks = textRecognizer.detect(imFrame)
+                val image = InputImage.fromBitmap(rotatedBitmap!!, 0)
+                val recognizer = TextRecognition.getClient()
 
-                val stringBuilder = StringBuilder()
-                for (i in 0 until textBlocks.size()) {
-                    val textBlock = textBlocks[textBlocks.keyAt(i)]
-                    stringBuilder.append(textBlock.value)
-                    stringBuilder.append("\n")
-                }
-                ocrResult = stringBuilder.toString()
-                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this /* Activity context */)
-                if (ocrResult != "" && sharedPreferences.getBoolean("history", true)) {
-                    extras!!.getString("imageUri")?.let { addHistoryItem(it, ocrResult) }
-                }
+                val result = recognizer.process(image)
+                    .addOnSuccessListener { visionText ->
+                        // Task completed successfully
+                        val resultText = visionText.text
+                        for (block in visionText.textBlocks) {
+                            val blockText = block.text
+                            val blockCornerPoints = block.cornerPoints
+                            val blockFrame = block.boundingBox
+                            for (line in block.lines) {
+                                val lineText = line.text
+                                val lineCornerPoints = line.cornerPoints
+                                val lineFrame = line.boundingBox
+                                for (element in line.elements) {
+                                    val elementText = element.text
+                                    val elementCornerPoints = element.cornerPoints
+                                    val elementFrame = element.boundingBox
+                                }
+                            }
+                        }
 
-                ocr_result.post {
-                    loading_anim.visibility = View.GONE;
-                    ocr_result.setText(ocrResult)
-                }
+                        ocrResult = visionText.text
+
+                        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this /* Activity context */)
+                        if (ocrResult != "" && sharedPreferences.getBoolean("history", true)) {
+                            extras!!.getString("imageUri")?.let { addHistoryItem(it, ocrResult) }
+                        }
+
+                        ocr_result.post {
+                            loading_anim.visibility = View.GONE;
+                            ocr_result.setText(ocrResult)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        // Task failed with an exception
+                        // ...
+                    }
             }
         }
 
@@ -402,18 +419,6 @@ class ResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupOCR() {
-        //  Create text Recognizer
-        textRecognizer = TextRecognizer.Builder(this).build()
-
-        if (!textRecognizer.isOperational) {
-            //Toast.makeText(this, "Dependencies are not loaded yet...please try after few moment!!", Toast.LENGTH_SHORT).show()
-            Snackbar.make(result_main, "Dependencies are not loaded yet...please try after few moment!!", Snackbar.LENGTH_SHORT).show()
-            Log.d("OCR","Dependencies are downloading....try after few moment")
-            return
-        }
-    }
-
     private fun addHistoryItem(uri:String, text:String) {
         var json = JSONArray()
 
@@ -469,15 +474,8 @@ class ResultActivity : AppCompatActivity() {
         image_view.setImageBitmap(cropped)
 
         val imFrame = Frame.Builder().setBitmap(cropped).build()
-        val textBlocks = textRecognizer.detect(imFrame)
 
-        val stringBuilder = StringBuilder()
-        for (i in 0 until textBlocks.size()) {
-            val textBlock = textBlocks[textBlocks.keyAt(i)]
-            stringBuilder.append(textBlock.value)
-            stringBuilder.append("\n")
-        }
-        ocrResult = stringBuilder.toString()
+
     }
 
 }
