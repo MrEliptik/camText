@@ -237,7 +237,8 @@ class HistoryActivity : AppCompatActivity() {
                 // Delete image if needed
                 else {
                     if (sharedPreferences.getBoolean("image_history", true)) {
-                        val file = File(item.get("Uri").toString())
+                        val uri = Uri.parse(item.get("Uri") as String?)
+                        val file = File(uri.path)
                         file?.delete()
                     }
                 }
